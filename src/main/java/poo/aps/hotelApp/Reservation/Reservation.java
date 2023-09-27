@@ -3,6 +3,7 @@ package poo.aps.hotelApp.Reservation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import poo.aps.hotelApp.Room.Room;
 import poo.aps.hotelApp.User.User;
 
 import java.util.Date;
@@ -17,5 +18,6 @@ public class Reservation {
     private int adultNum;
     private int childNum;
     private User user;
+    private Room room;
     private float value;
 }

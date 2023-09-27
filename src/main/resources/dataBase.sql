@@ -8,7 +8,7 @@ CREATE TABLE users(
 
 CREATE TABLE rooms(
     id LONG PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL,
     desc VARCHAR(100) NOT NULL,
     size INT NOT NULL,
     guests INT NOT NULL,

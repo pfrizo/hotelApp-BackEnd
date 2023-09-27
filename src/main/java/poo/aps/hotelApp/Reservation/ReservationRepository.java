@@ -3,6 +3,7 @@ package poo.aps.hotelApp.Reservation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import poo.aps.hotelApp.Room.RoomRepository;
 import poo.aps.hotelApp.User.UserRepository;
 
 import java.sql.*;
@@ -11,15 +12,13 @@ import java.util.List;
 
 @Repository
 public class ReservationRepository {
-    private final UserRepository userRepository;
-    public ReservationRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    UserRepository userRepository;
+    RoomRepository roomRepository;
 
-    private final String sqlInsert = "INSERT INTO reservations (checkIn, checkOut, adultNum, childNum, user, value) " +
+    private final String sqlInsert = "INSERT INTO reservations (checkIn, checkOut, adultNum, childNum, user, room, value) " +
                                     "VALUES (?, ?, ?, ?, ?, ?)";
 
-    private final String sqlQuery = "SELECT id, checkIn, checkOut, adultNum, childNum, user, value " +
+    private final String sqlQuery = "SELECT id, checkIn, checkOut, adultNum, childNum, user, room, value " +
                                     "FROM reservations";
 
     @Autowired
@@ -35,7 +34,8 @@ public class ReservationRepository {
             ps.setInt(3, reservation.getAdultNum());
             ps.setInt(4, reservation.getChildNum());
             ps.setLong(5, reservation.getUser().getId());
-            ps.setFloat(6, reservation.getValue());
+            ps.setLong(6, reservation.getRoom().getId());
+            ps.setFloat(7, reservation.getValue());
 
             int result = ps.executeUpdate();
 
@@ -65,6 +65,7 @@ public class ReservationRepository {
                     rs.getInt("adultNum"),
                     rs.getInt("childNum"),
                     userRepository.getUserById(rs.getLong("user")),
+                    roomRepository.getRoomById(rs.getLong("room")),
                     rs.getFloat("value")
                 );
                 list.add(reservation);
