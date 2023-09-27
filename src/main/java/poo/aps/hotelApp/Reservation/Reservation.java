@@ -11,9 +11,9 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Reservation {
-    private int id;
-    private Date checkInDate;
-    private Date checkOutDate;
+    private Long id;
+    private Date checkIn;
+    private Date checkOut;
     private int adultNum;
     private int childNum;
     private User user;

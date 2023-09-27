@@ -34,7 +34,7 @@ public class UserRepository {
             if (result == 1){
                 ResultSet tableKeys = ps.getGeneratedKeys();
                 tableKeys.next();
-                user.setId(tableKeys.getInt(1));
+                user.setId(tableKeys.getLong(1));
 
                 System.out.println("User entered successfully!");
                 return user;
@@ -53,7 +53,7 @@ public class UserRepository {
 
             while(rs.next()){
                 User user = new User(
-                    rs.getInt("id"),
+                    rs.getLong("id"),
                     rs.getString("username"),
                     rs.getString("password"),
                     rs.getString("email"),
@@ -66,7 +66,7 @@ public class UserRepository {
         }
     }
 
-    public User getUserById(int id) throws Exception {
+    public User getUserById(Long id) throws Exception {
         List<User> users = listUsers();
 
         for (User user : users) {

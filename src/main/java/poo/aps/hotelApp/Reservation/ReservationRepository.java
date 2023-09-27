@@ -16,10 +16,10 @@ public class ReservationRepository {
         this.userRepository = userRepository;
     }
 
-    private final String sqlInsert = "INSERT INTO reservations (check_in, check_out, adult_num, child_num, user_id, value) " +
+    private final String sqlInsert = "INSERT INTO reservations (checkIn, checkOut, adultNum, childNum, user, value) " +
                                     "VALUES (?, ?, ?, ?, ?, ?)";
 
-    private final String sqlQuery = "SELECT id, check_in, check_out, adult_num, child_num, user_id, value " +
+    private final String sqlQuery = "SELECT id, checkIn, checkOut, adultNum, childNum, user, value " +
                                     "FROM reservations";
 
     @Autowired
@@ -30,11 +30,11 @@ public class ReservationRepository {
 
         try (Connection con = jdbcTemplate.getDataSource().getConnection();
             PreparedStatement ps = con.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS)){
-            ps.setDate(1, (Date) reservation.getCheckInDate());
-            ps.setDate(2, (Date) reservation.getCheckOutDate());
+            ps.setDate(1, (Date) reservation.getCheckIn());
+            ps.setDate(2, (Date) reservation.getCheckOut());
             ps.setInt(3, reservation.getAdultNum());
             ps.setInt(4, reservation.getChildNum());
-            ps.setInt(5, reservation.getUser().getId());
+            ps.setLong(5, reservation.getUser().getId());
             ps.setFloat(6, reservation.getValue());
 
             int result = ps.executeUpdate();
@@ -42,7 +42,7 @@ public class ReservationRepository {
             if (result == 1){
                 ResultSet tableKeys = ps.getGeneratedKeys();
                 tableKeys.next();
-                reservation.setId(tableKeys.getInt(1));
+                reservation.setId(tableKeys.getLong(1));
 
                 System.out.println("Reservation registered successfully!");
                 return reservation;
@@ -59,12 +59,12 @@ public class ReservationRepository {
 
             while(rs.next()){
                 Reservation reservation = new Reservation(
-                    rs.getInt("id"),
-                    rs.getDate("check_in"),
-                    rs.getDate("check_out"),
-                    rs.getInt("adult_num"),
-                    rs.getInt("child_num"),
-                    userRepository.getUserById(rs.getInt("user_id")),
+                    rs.getLong("id"),
+                    rs.getDate("checkIn"),
+                    rs.getDate("checkOut"),
+                    rs.getInt("adultNum"),
+                    rs.getInt("childNum"),
+                    userRepository.getUserById(rs.getLong("user")),
                     rs.getFloat("value")
                 );
                 list.add(reservation);

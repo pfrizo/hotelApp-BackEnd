@@ -29,7 +29,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public Response getUserById(@PathVariable int id) {
+    public Response getUserById(@PathVariable Long id) {
         try {
             return new Response(repository.getUserById(id));
         } catch (Exception e){
