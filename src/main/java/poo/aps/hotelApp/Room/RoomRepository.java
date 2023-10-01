@@ -16,7 +16,7 @@ public class RoomRepository {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    private final String sqlQuery = "SELECT id, name, desc, size, guests, dailyValue FROM rooms";
+    private final String sqlQuery = "SELECT id, name, desc, size, guests, daily_value FROM rooms";
 
     public List<Room> listRooms() throws Exception {
         try (Connection con = jdbcTemplate.getDataSource().getConnection();

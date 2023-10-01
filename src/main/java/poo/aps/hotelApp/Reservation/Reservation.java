@@ -19,5 +19,5 @@ public class Reservation {
     private int childNum;
     private User user;
     private Room room;
-    private float value;
+    private float price;
 }

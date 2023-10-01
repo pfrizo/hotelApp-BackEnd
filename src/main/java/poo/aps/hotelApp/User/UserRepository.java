@@ -3,11 +3,9 @@ package poo.aps.hotelApp.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import poo.aps.hotelApp.Reservation.Reservation;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,5 +75,53 @@ public class UserRepository {
             }
         }
         return null;
+    }
+
+    private String sqlUpdate = "UPDATE users SET " +
+            "first_name = ?, " +
+            "last_name = ?, " +
+            "email = ?, " +
+            "password = ?, " +
+            "cpf = ? " +
+            "WHERE id = ?";
+
+    public User updateUser(Long id, User user) throws Exception{
+        try(Connection con = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement ps = con.prepareStatement(sqlUpdate)){
+            ps.setString(1, user.getFirstName());
+            ps.setString(2, user.getLastName());
+            ps.setString(3, user.getEmail());
+            ps.setString(4, user.getPassword());
+            ps.setString(5, user.getCpf());
+            ps.setLong(6, user.getId());
+
+            int result = ps.executeUpdate();
+
+            if (result == 1){
+                System.out.println("User updated successfully!");
+                user.setId(id);
+                return user;
+            }
+            throw new Exception("ERROR! User could not be updated!");
+        }
+    }
+
+    private String sqlDelete = "DELETE FROM users WHERE id = ?";
+
+    public User deleteUser(Long id) throws Exception{
+        try(Connection con = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement ps = con.prepareStatement(sqlDelete)){
+
+            ps.setLong(1, id);
+
+            int result = ps.executeUpdate();
+
+            if (result == 1){
+                System.out.println("User deleted successfully!");
+                return null;
+            }
+
+            throw new Exception("ERROR! User could not be deleted!");
+        }
     }
 }
