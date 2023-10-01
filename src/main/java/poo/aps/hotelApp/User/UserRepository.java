@@ -13,8 +13,8 @@ import java.util.List;
 
 @Repository
 public class UserRepository {
-    private final String sqlInsert = "INSERT INTO users (username, password, email, cpf) " +
-            "VALUES (?, ?, ?, ?)";
+    private final String sqlInsert = "INSERT INTO users (firstName, lastName, email, password, cpf) " +
+            "VALUES (?, ?, ?, ?, ?)";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -24,10 +24,11 @@ public class UserRepository {
 
         try (Connection con = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement ps = con.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS)){
-            ps.setString(1, user.getUsername());
-            ps.setString(2, user.getPassword());
+            ps.setString(1, user.getFirstName());
+            ps.setString(2, user.getLastName());
             ps.setString(3, user.getEmail());
-            ps.setString(4, user.getCpf());
+            ps.setString(4, user.getPassword());
+            ps.setString(5, user.getCpf());
 
             int result = ps.executeUpdate();
 
@@ -43,7 +44,7 @@ public class UserRepository {
         }
     }
 
-    private final String sqlQuery = "SELECT id, username, password, email, cpf FROM users";
+    private final String sqlQuery = "SELECT id, firstName, lastName, email, password, cpf FROM users";
 
     public List<User> listUsers() throws Exception {
         try (Connection con = jdbcTemplate.getDataSource().getConnection();
@@ -54,9 +55,10 @@ public class UserRepository {
             while(rs.next()){
                 User user = new User(
                     rs.getLong("id"),
-                    rs.getString("username"),
-                    rs.getString("password"),
+                    rs.getString("firstName"),
+                    rs.getString("lastName"),
                     rs.getString("email"),
+                    rs.getString("password"),
                     rs.getString("cpf")
                 );
                 list.add(user);

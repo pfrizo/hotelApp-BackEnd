@@ -1,8 +1,9 @@
 CREATE TABLE users(
     id LONG PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(100) NOT NULL,
-    password VARCHAR(100) NOT NULL,
+    firstName VARCHAR(100) NOT NULL,
+    lastName VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
+    password VARCHAR(100) NOT NULL,
     cpf VARCHAR(20) NOT NULL
 );
 
@@ -21,11 +22,11 @@ CREATE TABLE reservations(
     checkOut DATE NOT NULL,
     adultNum INT NOT NULL,
     childNum INT,
-    user LONG NOT NULL,
+    userId LONG NOT NULL,
     room LONG NOT NULL,
-    value FLOAT NOT NULL,
+    price FLOAT NOT NULL,
 
-    CONSTRAINT reservations_users_FK FOREIGN KEY (user) REFERENCES users(id),
+    CONSTRAINT reservations_users_FK FOREIGN KEY (userId) REFERENCES users(id),
     CONSTRAINT reservations_rooms_FK FOREIGN KEY (room) REFERENCES rooms(id)
 );
 

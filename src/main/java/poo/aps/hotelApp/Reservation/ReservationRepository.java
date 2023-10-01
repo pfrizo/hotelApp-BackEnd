@@ -15,10 +15,10 @@ public class ReservationRepository {
     UserRepository userRepository;
     RoomRepository roomRepository;
 
-    private final String sqlInsert = "INSERT INTO reservations (checkIn, checkOut, adultNum, childNum, user, room, value) " +
+    private final String sqlInsert = "INSERT INTO reservations (checkIn, checkOut, adultNum, childNum, userId, room, price) " +
                                     "VALUES (?, ?, ?, ?, ?, ?)";
 
-    private final String sqlQuery = "SELECT id, checkIn, checkOut, adultNum, childNum, user, room, value " +
+    private final String sqlQuery = "SELECT id, checkIn, checkOut, adultNum, childNum, userId, room, price " +
                                     "FROM reservations";
 
     @Autowired
@@ -64,9 +64,9 @@ public class ReservationRepository {
                     rs.getDate("checkOut"),
                     rs.getInt("adultNum"),
                     rs.getInt("childNum"),
-                    userRepository.getUserById(rs.getLong("user")),
+                    userRepository.getUserById(rs.getLong("userId")),
                     roomRepository.getRoomById(rs.getLong("room")),
-                    rs.getFloat("value")
+                    rs.getFloat("price")
                 );
                 list.add(reservation);
             }

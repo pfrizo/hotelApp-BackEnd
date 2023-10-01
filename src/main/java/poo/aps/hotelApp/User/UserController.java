@@ -4,13 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import poo.aps.hotelApp.Response;
 
-@RestController("/api/users")
+@RestController
+@RequestMapping("/api/users")
 public class UserController {
 
     @Autowired
     UserRepository repository;
 
-    @PostMapping("/")
+    @PostMapping("/register")
     public Response include(@RequestBody User user) {
         try {
             return new Response(repository.include(user));
