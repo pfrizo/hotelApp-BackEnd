@@ -29,7 +29,7 @@ public class RoomRepository {
                         rs.getLong("id"),
                         rs.getString("name"),
                         rs.getString("desc"),
-                        rs.getInt("size"),
+                        rs.getString("size"),
                         rs.getInt("guests"),
                         rs.getFloat("dailyValue")
                 );

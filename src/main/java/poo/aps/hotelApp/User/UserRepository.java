@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import poo.aps.hotelApp.Reservation.Reservation;
+import poo.aps.hotelApp.Validators.CpfValidator;
+import poo.aps.hotelApp.Validators.EmailValidator;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,7 +13,7 @@ import java.util.List;
 
 @Repository
 public class UserRepository {
-    private final String sqlInsert = "INSERT INTO users (firstName, lastName, email, password, cpf) " +
+    private final String sqlInsert = "INSERT INTO users (first_name, last_name, email, password, cpf) " +
             "VALUES (?, ?, ?, ?, ?)";
 
     @Autowired
@@ -19,6 +21,7 @@ public class UserRepository {
 
     public User include(User user) throws Exception {
         //TODO User validation
+        userValidation(user, true);
 
         try (Connection con = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement ps = con.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS)){
@@ -42,7 +45,7 @@ public class UserRepository {
         }
     }
 
-    private final String sqlQuery = "SELECT id, firstName, lastName, email, password, cpf FROM users";
+    private final String sqlQuery = "SELECT id, first_name, last_name, email, password, cpf FROM users";
 
     public List<User> listUsers() throws Exception {
         try (Connection con = jdbcTemplate.getDataSource().getConnection();
@@ -53,8 +56,8 @@ public class UserRepository {
             while(rs.next()){
                 User user = new User(
                     rs.getLong("id"),
-                    rs.getString("firstName"),
-                    rs.getString("lastName"),
+                    rs.getString("first_name"),
+                    rs.getString("last_name"),
                     rs.getString("email"),
                     rs.getString("password"),
                     rs.getString("cpf")
@@ -86,6 +89,9 @@ public class UserRepository {
             "WHERE id = ?";
 
     public User updateUser(Long id, User user) throws Exception{
+        user.setId(id);
+        userValidation(user, false);
+
         try(Connection con = jdbcTemplate.getDataSource().getConnection();
             PreparedStatement ps = con.prepareStatement(sqlUpdate)){
             ps.setString(1, user.getFirstName());
@@ -93,13 +99,12 @@ public class UserRepository {
             ps.setString(3, user.getEmail());
             ps.setString(4, user.getPassword());
             ps.setString(5, user.getCpf());
-            ps.setLong(6, user.getId());
+            ps.setLong(6, id);
 
             int result = ps.executeUpdate();
 
             if (result == 1){
                 System.out.println("User updated successfully!");
-                user.setId(id);
                 return user;
             }
             throw new Exception("ERROR! User could not be updated!");
@@ -122,6 +127,64 @@ public class UserRepository {
             }
 
             throw new Exception("ERROR! User could not be deleted!");
+        }
+    }
+
+    private void userValidation(User user, boolean inserting) throws Exception {
+        if (user.getFirstName() == null || user.getFirstName().trim().isEmpty()){
+            throw new Exception("First name cannot be empty");
+        }
+        user.setFirstName(user.getFirstName().trim());
+
+        if (user.getLastName() == null || user.getLastName().trim().isEmpty()){
+            throw new Exception("Last name cannot be empty");
+        }
+        user.setLastName(user.getLastName().trim());
+
+        if (user.getEmail() == null || user.getEmail().trim().isEmpty()){
+            throw new Exception("E-mail cannot be empty");
+        }
+        EmailValidator.validate(user.getEmail());
+        user.setEmail(user.getEmail().trim());
+
+        if (user.getPassword() == null || user.getPassword().trim().isEmpty()){
+            throw new Exception("Password cannot be empty");
+        }
+
+        if (user.getCpf() == null || user.getCpf().trim().isEmpty()){
+            throw new Exception("CPF cannot be empty");
+        }
+        if(!CpfValidator.validate(user.getCpf())){
+            throw new IllegalArgumentException("Invalid CPF!");
+        }
+        user.setCpf(CpfValidator.formatCpf(user.getCpf().trim()));
+
+        String query = "SELECT id FROM users WHERE email = ?";
+
+        try(Connection con = jdbcTemplate.getDataSource().getConnection();
+        PreparedStatement ps = con.prepareStatement(query)){
+            ps.setString(1, user.getEmail());
+            try(ResultSet rs = ps.executeQuery()){
+                if (rs.next()){
+                    if (inserting || rs.getInt("id") != user.getId()){
+                        throw new Exception("E-mail already registered!");
+                    }
+                }
+            }
+        }
+
+        query = "SELECT id FROM users WHERE cpf = ?";
+
+        try(Connection con = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement ps = con.prepareStatement(query)){
+            ps.setString(1, user.getCpf());
+            try(ResultSet rs = ps.executeQuery()){
+                if (rs.next()){
+                    if (inserting || rs.getInt("id") != user.getId()){
+                        throw new Exception("CPF already registered!");
+                    }
+                }
+            }
         }
     }
 }

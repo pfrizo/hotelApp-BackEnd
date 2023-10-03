@@ -8,6 +8,8 @@ import poo.aps.hotelApp.User.User;
 import poo.aps.hotelApp.User.UserRepository;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +19,7 @@ public class ReservationRepository {
     RoomRepository roomRepository;
 
     private final String sqlInsert = "INSERT INTO reservations (check_in, check_out, adult_num, child_num, user_id, room, price) " +
-                                    "VALUES (?, ?, ?, ?, ?, ?)";
+                                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     private final String sqlQuery = "SELECT id, check_in, check_out, adult_num, child_num, user_id, room, price " +
                                     "FROM reservations";
@@ -30,13 +32,13 @@ public class ReservationRepository {
 
         try (Connection con = jdbcTemplate.getDataSource().getConnection();
             PreparedStatement ps = con.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS)){
-            ps.setDate(1, (Date) reservation.getCheckIn());
-            ps.setDate(2, (Date) reservation.getCheckOut());
+            ps.setDate(1, reservation.getCheckIn());
+            ps.setDate(2, reservation.getCheckOut());
             ps.setInt(3, reservation.getAdultNum());
             ps.setInt(4, reservation.getChildNum());
             ps.setLong(5, reservation.getUser().getId());
             ps.setLong(6, reservation.getRoom().getId());
-            ps.setFloat(7, reservation.getPrice());
+            ps.setFloat(7,calcDays(reservation.getCheckIn(), reservation.getCheckOut()) * reservation.getRoom().getDailyValue());
 
             int result = ps.executeUpdate();
 
@@ -44,12 +46,20 @@ public class ReservationRepository {
                 ResultSet tableKeys = ps.getGeneratedKeys();
                 tableKeys.next();
                 reservation.setId(tableKeys.getLong(1));
+                reservation.setPrice(calcDays(reservation.getCheckIn(), reservation.getCheckOut()) * reservation.getRoom().getDailyValue());
 
                 System.out.println("Reservation registered successfully!");
                 return reservation;
             }
             throw new Exception("Error! Reservation could not be registered!");
         }
+    }
+
+    private long calcDays(Date checkIn, Date checkOut) {
+        LocalDate in = checkIn.toLocalDate();
+        LocalDate out = checkOut.toLocalDate();
+
+        return ChronoUnit.DAYS.between(in, out);
     }
 
     public List<Reservation> list() throws Exception{

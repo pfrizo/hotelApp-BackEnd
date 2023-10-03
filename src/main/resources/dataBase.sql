@@ -30,11 +30,11 @@ CREATE TABLE reservations(
     CONSTRAINT reservations_rooms_FK FOREIGN KEY (room) REFERENCES rooms(id)
 );
 
-INSERT INTO rooms (name, desc, size, guests, dailyValue)
-    VALUES ("Single", "Single bed, bathroom, phone and wi-fi", "15m²", 1, 150.00);
+INSERT INTO rooms (name, desc, size, guests, daily_value)
+    VALUES ('Single', 'Single bed, bathroom, phone and wi-fi', '15m²', 1, 150.00);
 
-INSERT INTO rooms (name, desc, size, guests, dailyValue)
-    VALUES ("Couple", "Couple bed (Queen-size), bathroom, phone, wi-fi and tv", "25m²", 2, 200.00);
+INSERT INTO rooms (name, desc, size, guests, daily_value)
+    VALUES ('Couple', 'Couple bed (Queen-size), bathroom, phone, wi-fi and tv', '25m²', 2, 200.00);
 
-INSERT INTO rooms (name, desc, size, guests, dailyValue)
-    VALUES ("Luxury", "2 King-size beds, bathrooom, phone, wi-fi, breakfast, lunch, dinner", "40m²", 4, 300.00);
+INSERT INTO rooms (name, desc, size, guests, daily_value)
+    VALUES ('Luxury', '2 King-size beds, bathrooom, phone, wi-fi, breakfast, lunch, dinner', '40m²', 4, 300.00);

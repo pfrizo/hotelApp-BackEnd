@@ -9,7 +9,7 @@ public class Room {
     private Long id;
     private String name;
     private String desc;
-    private int size;
+    private String size;
     private int guests;
     private float dailyValue;
 }

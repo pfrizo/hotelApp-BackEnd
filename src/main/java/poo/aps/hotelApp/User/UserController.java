@@ -47,4 +47,13 @@ public class UserController {
             return new Response(e.getMessage());
         }
     }
+
+    @DeleteMapping("/{id}")
+    public Response delete(@PathVariable Long id){
+        try{
+            return new Response(repository.deleteUser(id));
+        } catch (Exception e){
+            return new Response(e.getMessage());
+        }
+    }
 }

@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import poo.aps.hotelApp.Room.Room;
 import poo.aps.hotelApp.User.User;
 
-import java.util.Date;
+import java.sql.Date;
 
 @Data
 @AllArgsConstructor
