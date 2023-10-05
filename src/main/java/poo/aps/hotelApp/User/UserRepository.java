@@ -45,6 +45,16 @@ public class UserRepository {
         }
     }
 
+    public User login(LoginRequest loginRequest) throws Exception {
+
+        User user = getUserByEmail(loginRequest.getEmail());
+
+        if (user == null || !user.getPassword().equals(loginRequest.getPassword())){
+            throw new RuntimeException("Invalid Credentials!");
+        }
+        return user;
+    }
+
     private final String sqlQuery = "SELECT id, first_name, last_name, email, password, cpf FROM users";
 
     public List<User> listUsers() throws Exception {
@@ -74,6 +84,28 @@ public class UserRepository {
 
         for (User user : users) {
             if (user.getId() == id) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    public User getUserByCpf(String cpf) throws Exception {
+        List<User> users = listUsers();
+
+        for (User user : users) {
+            if (user.getCpf().equals(cpf)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    public User getUserByEmail(String email) throws Exception {
+        List<User> users = listUsers();
+
+        for (User user : users) {
+            if (user.getEmail().equals(email)) {
                 return user;
             }
         }

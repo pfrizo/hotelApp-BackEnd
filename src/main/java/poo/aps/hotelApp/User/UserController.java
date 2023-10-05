@@ -13,7 +13,8 @@ public class UserController {
     UserRepository repository;
 
     @PostMapping("/register")
-    public Response include(@RequestBody User user) {
+    @CrossOrigin(origins = "http://127.0.0.1:5500/")
+    public Response register(@RequestBody User user) {
         try {
             return new Response(repository.include(user));
         } catch (Exception e){
@@ -21,7 +22,18 @@ public class UserController {
         }
     }
 
-    @GetMapping("")
+    @PostMapping("/login")
+    @CrossOrigin(origins = "http://127.0.0.1:5500/")
+    public Response login(@RequestBody LoginRequest loginRequest){
+        try{
+            return new Response(repository.login(loginRequest));
+        } catch (Exception e) {
+            return new Response(e.getMessage());
+        }
+    }
+
+    @GetMapping("/listAll")
+    @CrossOrigin(origins = "http://127.0.0.1:5500/")
     public Response list() {
         try {
             return new Response(repository.listUsers());
@@ -31,6 +43,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @CrossOrigin(origins = "http://127.0.0.1:5500/")
     public Response getUserById(@PathVariable Long id) {
         try {
             return new Response(repository.getUserById(id));
@@ -40,6 +53,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @CrossOrigin(origins = "http://127.0.0.1:5500/")
     public Response update(@PathVariable Long id, @RequestBody User user){
         try{
             return new Response(repository.updateUser(id, user));
@@ -49,6 +63,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @CrossOrigin(origins = "http://127.0.0.1:5500/")
     public Response delete(@PathVariable Long id){
         try{
             return new Response(repository.deleteUser(id));

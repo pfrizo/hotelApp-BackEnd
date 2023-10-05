@@ -31,7 +31,7 @@ public class RoomRepository {
                         rs.getString("desc"),
                         rs.getString("size"),
                         rs.getInt("guests"),
-                        rs.getFloat("dailyValue")
+                        rs.getFloat("daily_value")
                 );
                 list.add(room);
             }

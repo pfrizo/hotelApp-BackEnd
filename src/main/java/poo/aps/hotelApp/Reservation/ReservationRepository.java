@@ -15,7 +15,11 @@ import java.util.List;
 
 @Repository
 public class ReservationRepository {
+
+    @Autowired
     UserRepository userRepository;
+
+    @Autowired
     RoomRepository roomRepository;
 
     private final String sqlInsert = "INSERT INTO reservations (check_in, check_out, adult_num, child_num, user_id, room, price) " +
@@ -47,6 +51,41 @@ public class ReservationRepository {
                 tableKeys.next();
                 reservation.setId(tableKeys.getLong(1));
                 reservation.setPrice(calcDays(reservation.getCheckIn(), reservation.getCheckOut()) * reservation.getRoom().getDailyValue());
+
+                System.out.println("Reservation registered successfully!");
+                return reservation;
+            }
+            throw new Exception("Error! Reservation could not be registered!");
+        }
+    }
+
+    public Reservation registerReservation(ReservationRequest reservationRequest) throws Exception{
+        try (Connection con = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement ps = con.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS)){
+            ps.setDate(1, reservationRequest.getCheckIn());
+            ps.setDate(2, reservationRequest.getCheckOut());
+            ps.setInt(3, reservationRequest.getAdultNum());
+            ps.setInt(4, reservationRequest.getChildNum());
+            ps.setLong(5, userRepository.getUserByEmail(reservationRequest.email).getId());
+            ps.setLong(6, roomRepository.getRoomById(reservationRequest.room).getId());
+            ps.setFloat(7,calcDays(reservationRequest.getCheckIn(), reservationRequest.getCheckOut()) * roomRepository.getRoomById(reservationRequest.room).getDailyValue());
+
+            int result = ps.executeUpdate();
+
+            if (result == 1){
+                ResultSet tableKeys = ps.getGeneratedKeys();
+                tableKeys.next();
+
+                Reservation reservation = new Reservation(
+                        tableKeys.getLong(1),
+                        reservationRequest.checkIn,
+                        reservationRequest.checkOut,
+                        reservationRequest.adultNum,
+                        reservationRequest.childNum,
+                        userRepository.getUserByEmail(reservationRequest.email),
+                        roomRepository.getRoomById(reservationRequest.room),
+                        calcDays(reservationRequest.getCheckIn(), reservationRequest.getCheckOut()) * roomRepository.getRoomById(reservationRequest.room).getDailyValue()
+                );
 
                 System.out.println("Reservation registered successfully!");
                 return reservation;
@@ -109,20 +148,21 @@ public class ReservationRepository {
     public Reservation updateReservation(Long id, Reservation reservation) throws Exception{
         try(Connection con = jdbcTemplate.getDataSource().getConnection();
             PreparedStatement ps = con.prepareStatement(sqlUpdate)){
-            ps.setDate(1, (Date) reservation.getCheckIn());
-            ps.setDate(2, (Date) reservation.getCheckOut());
+            ps.setDate(1, reservation.getCheckIn());
+            ps.setDate(2, reservation.getCheckOut());
             ps.setInt(3, reservation.getAdultNum());
             ps.setInt(4, reservation.getChildNum());
             ps.setLong(5, reservation.getUser().getId());
             ps.setLong(6, reservation.getRoom().getId());
-            ps.setFloat(7, reservation.getPrice());
-            ps.setLong(8, reservation.getId());
+            ps.setFloat(7, calcDays(reservation.getCheckIn(), reservation.getCheckOut()) * reservation.getRoom().getDailyValue());
+            ps.setLong(8, id);
 
             int result = ps.executeUpdate();
 
             if (result == 1){
                 System.out.println("Reservation updated successfully!");
                 reservation.setId(id);
+                reservation.setPrice(calcDays(reservation.getCheckIn(), reservation.getCheckOut()) * reservation.getRoom().getDailyValue());
                 return reservation;
             }
             throw new Exception("ERROR! Reservation could not be updated!");

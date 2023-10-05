@@ -12,6 +12,7 @@ public class ReservationController {
     ReservationRepository repository;
 
     @PostMapping("/")
+    @CrossOrigin(origins = "http://127.0.0.1:5500/")
     public Response createReservation(@RequestBody Reservation reservation){
         try{
             return new Response(repository.include(reservation));
@@ -20,7 +21,18 @@ public class ReservationController {
         }
     }
 
+    @PostMapping("/register")
+    @CrossOrigin(origins = "http://127.0.0.1:5500/")
+    public Response registerReservation(@RequestBody ReservationRequest reservationRequest){
+        try{
+            return new Response(repository.registerReservation(reservationRequest));
+        } catch (Exception e){
+            return new Response(e.getMessage());
+        }
+    }
+
     @GetMapping("/listAll")
+    @CrossOrigin(origins = "http://127.0.0.1:5500/")
     public Response listAll(){
         try{
             return new Response(repository.list());
@@ -30,6 +42,7 @@ public class ReservationController {
     }
 
     @GetMapping("/{id}")
+    @CrossOrigin(origins = "http://127.0.0.1:5500/")
     public Response getReservationById(@PathVariable Long id){
         try{
             return new Response(repository.getReservationById(id));
@@ -39,6 +52,7 @@ public class ReservationController {
     }
 
     @PutMapping("/{id}")
+    @CrossOrigin(origins = "http://127.0.0.1:5500/")
     public Response updateReservation(@PathVariable Long id, @RequestBody Reservation reservation){
         try{
             return new Response(repository.updateReservation(id, reservation));
@@ -48,6 +62,7 @@ public class ReservationController {
     }
 
     @DeleteMapping("/{id}")
+    @CrossOrigin(origins = "http://127.0.0.1:5500/")
     public Response deleteReservation(@PathVariable Long id){
         try{
            return new Response(repository.deleteReservation(id));
