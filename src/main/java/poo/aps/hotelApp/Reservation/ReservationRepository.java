@@ -11,6 +11,7 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 @Repository
@@ -27,6 +28,9 @@ public class ReservationRepository {
 
     private final String sqlQuery = "SELECT id, check_in, check_out, adult_num, child_num, user_id, room, price " +
                                     "FROM reservations";
+
+    private final String sqlQueryByUser = "SELECT id, check_in, check_out, adult_num, child_num, user_id, room, price " +
+                                            "FROM reservations WHERE user_id = ?";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -60,6 +64,8 @@ public class ReservationRepository {
 //    }
 
     public Reservation registerReservation(ReservationRequest reservationRequest) throws Exception{
+        reservationValidation(reservationRequest);
+
         try (Connection con = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement ps = con.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS)){
             ps.setDate(1, reservationRequest.getCheckIn());
@@ -120,6 +126,30 @@ public class ReservationRepository {
                 );
                 list.add(reservation);
             }
+            return list;
+        }
+    }
+
+    public List<Reservation> listByUser(Long userId) throws Exception{
+        try (Connection con = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement ps = con.prepareStatement(sqlQueryByUser)) {
+            ps.setLong(1, userId);
+            ResultSet rs = ps.executeQuery();
+            List<Reservation> list = new ArrayList<>();
+
+                while (rs.next()) {
+                    Reservation reservation = new Reservation(
+                            rs.getLong("id"),
+                            rs.getDate("check_in"),
+                            rs.getDate("check_out"),
+                            rs.getInt("adult_num"),
+                            rs.getInt("child_num"),
+                            userRepository.getUserById(rs.getLong("user_id")),
+                            roomRepository.getRoomById(rs.getLong("room")),
+                            rs.getFloat("price")
+                    );
+                    list.add(reservation);
+                }
             return list;
         }
     }
@@ -192,5 +222,74 @@ public class ReservationRepository {
 
             throw new Exception("ERROR! Reservation could not be deleted!");
         }
+    }
+
+    private void reservationValidation(ReservationRequest reservation) throws Exception{
+        Calendar today = Calendar.getInstance();
+
+        //checkIn validator
+        if(reservation.getCheckIn() == null){
+            throw new Exception("CheckIn date cannot be empty");
+        }
+
+        if(reservation.getCheckIn().compareTo(today.getTime())>= 0){
+            throw new Exception("CheckIn date must be greater than or equal to the current day");
+        }
+
+        //checkOut validator
+        if(reservation.getCheckOut() == null){
+            throw new Exception("CheckOut date cannot be empty");
+        }
+
+        if(reservation.getCheckOut().compareTo(today.getTime()) > 0){
+            throw new Exception("CheckOut date must be greater than to the current day");
+        }
+
+        if(reservation.getCheckOut().compareTo(reservation.getCheckIn()) > 0){
+            throw new Exception("CheckOut date must be greater than to the checkIn date");
+        }
+
+        //adultNum validator
+        if(reservation.getAdultNum() < 0){
+            throw new Exception("AdultNum must be greater than 0");
+        }
+
+        //user validator
+        String query = "SELECT * FROM users WHERE id = ?";
+
+        try(Connection con = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement ps = con.prepareStatement(query)){
+            ps.setLong(1, reservation.getUserId());
+            try(ResultSet rs = ps.executeQuery()){
+                if (!rs.next()){
+                    throw new Exception("User not exists!");
+                }
+            }
+        }
+
+        //room validator
+        query = "SELECT * FROM rooms WHERE id = ?";
+
+        try(Connection con = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement ps = con.prepareStatement(query)){
+            ps.setLong(1, reservation.getRoom());
+            try(ResultSet rs = ps.executeQuery()){
+                if (!rs.next()){
+                    throw new Exception("Room not exists!");
+                }
+            }
+        }
+
+//        query = "SELECT room FROM reservations WHERE id = ?";
+//
+//        try(Connection con = jdbcTemplate.getDataSource().getConnection();
+//            PreparedStatement ps = con.prepareStatement(query)){
+//            ps.setLong(1, reservation.getId());
+//            try(ResultSet rs = ps.executeQuery()){
+//                if (!rs.next()){
+//                    throw new Exception("Room is already reserved!");
+//                }
+//            }
+//        }
     }
 }

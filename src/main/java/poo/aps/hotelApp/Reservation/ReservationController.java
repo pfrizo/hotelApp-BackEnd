@@ -41,6 +41,17 @@ public class ReservationController {
         }
     }
 
+    @GetMapping("/listByUser/{userId}")
+    @CrossOrigin(origins = "http://127.0.0.1:5500/")
+    public Response listByUser(@PathVariable Long userId){
+        try {
+            return new Response(repository.listByUser(userId));
+        } catch (Exception e){
+            return new Response(e.getMessage());
+        }
+    }
+
+
     @GetMapping("/{id}")
     @CrossOrigin(origins = "http://127.0.0.1:5500/")
     public Response getReservationById(@PathVariable Long id){
