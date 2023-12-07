@@ -11,15 +11,15 @@ public class ReservationController {
     @Autowired
     ReservationRepository repository;
 
-    @PostMapping("/")
-    @CrossOrigin(origins = "http://127.0.0.1:5500/")
-    public Response createReservation(@RequestBody Reservation reservation){
-        try{
-            return new Response(repository.include(reservation));
-        } catch (Exception e){
-            return new Response(e.getMessage());
-        }
-    }
+//    @PostMapping("/")
+//    @CrossOrigin(origins = "http://127.0.0.1:5500/")
+//    public Response createReservation(@RequestBody Reservation reservation){
+//        try{
+//            return new Response(repository.include(reservation));
+//        } catch (Exception e){
+//            return new Response(e.getMessage());
+//        }
+//    }
 
     @PostMapping("/register")
     @CrossOrigin(origins = "http://127.0.0.1:5500/")
@@ -53,9 +53,9 @@ public class ReservationController {
 
     @PutMapping("/{id}")
     @CrossOrigin(origins = "http://127.0.0.1:5500/")
-    public Response updateReservation(@PathVariable Long id, @RequestBody Reservation reservation){
+    public Response updateReservation(@PathVariable Long id, @RequestBody ReservationRequest reservationRequest){
         try{
-            return new Response(repository.updateReservation(id, reservation));
+            return new Response(repository.updateReservation(id, reservationRequest));
         } catch (Exception e){
             return new Response(e.getMessage());
         }
