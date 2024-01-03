@@ -64,7 +64,7 @@ public class ReservationRepository {
 //    }
 
     public Reservation registerReservation(ReservationRequest reservationRequest) throws Exception{
-        reservationValidation(reservationRequest);
+        //reservationValidation(reservationRequest);
 
         try (Connection con = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement ps = con.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS)){

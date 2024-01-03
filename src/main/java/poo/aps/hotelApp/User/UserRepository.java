@@ -20,7 +20,6 @@ public class UserRepository {
     private JdbcTemplate jdbcTemplate;
 
     public User include(User user) throws Exception {
-        //TODO User validation
         userValidation(user, true);
 
         try (Connection con = jdbcTemplate.getDataSource().getConnection();
